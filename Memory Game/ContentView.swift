@@ -33,7 +33,10 @@ struct CardView: View {
                         .fill(Color.blue)
                 }
             }
-            .frame(width: 80, height: 130)        }
+            .frame(width: 80, height: 130)
+            .rotation3DEffect(.degrees(card.isFaceUp ? 0 : 180), axis: (x: 0, y: 1, z: 0)) // Add 3D rotation for the flip
+            .animation(.easeInOut(duration: 0.5), value: card.isFaceUp) // Smooth animation for flipping
+        }
     }
 }
 
@@ -74,29 +77,36 @@ struct ContentView: View {
         }
     }
 
-    // MARK: - Game Logic
-
+    // Game Logic
     func handleCardTap(at index: Int) {
         if !cards[index].isFaceUp && !cards[index].isMatched {  // Only proceed if the card is facedown and not matched
             if let previousIndex = indexOfSelectedCard, previousIndex != index {
                 // A card is already selected, check for a match
-                cards[index].isFaceUp = true // Flip the current card face-up
+                withAnimation {
+                    cards[index].isFaceUp = true // Flip the current card face-up
+                }
                 if cards[previousIndex].content == cards[index].content {
                     // Cards match
-                    cards[previousIndex].isMatched = true
-                    cards[index].isMatched = true
+                    withAnimation {
+                        cards[previousIndex].isMatched = true
+                        cards[index].isMatched = true
+                    }
                 } else {
                     // No match, flip both cards back down after a delay
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                        cards[previousIndex].isFaceUp = false
-                        cards[index].isFaceUp = false
+                        withAnimation {
+                            cards[previousIndex].isFaceUp = false
+                            cards[index].isFaceUp = false
+                        }
                     }
                 }
                 indexOfSelectedCard = nil // Reset the selected card
             } else {
                 // No cards or only one card is selected, flip the current card
                 indexOfSelectedCard = index
-                cards[index].isFaceUp = true
+                withAnimation {
+                    cards[index].isFaceUp = true
+                }
             }
         }
     }
