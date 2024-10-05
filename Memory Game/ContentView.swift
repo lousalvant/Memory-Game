@@ -22,15 +22,19 @@ struct CardView: View {
                 if card.isFaceUp {
                     // Face-up card
                     RoundedRectangle(cornerRadius: 10)
-                        .fill(Color.white)
+                        .fill(LinearGradient(colors: [.purple, .pink, .orange], startPoint: .topLeading, endPoint: .bottomTrailing)) // Apply the gradient
+                        .shadow(color: .black.opacity(0.4), radius: 4, x: 2, y: 2) // Adding shadow for depth
                     RoundedRectangle(cornerRadius: 10)
                         .stroke(lineWidth: 3)
+                        .shadow(color: .black.opacity(0.3), radius: 4, x: 2, y: 2) // Adding shadow to stroke
                     Text(card.content)
                         .font(.largeTitle)
+                        .foregroundColor(.white)
                 } else {
                     // Face-down card
                     RoundedRectangle(cornerRadius: 10)
-                        .fill(Color.blue)
+                        .fill(LinearGradient(colors: [.blue, .teal, .indigo], startPoint: .topLeading, endPoint: .bottomTrailing)) // Gradient for face-down cards
+                        .shadow(color: .black.opacity(0.4), radius: 4, x: 2, y: 2)
                 }
             }
             .frame(width: 80, height: 130)
@@ -50,27 +54,44 @@ struct ContentView: View {
     let columns = [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())] // 4x4 grid
 
     var body: some View {
-        VStack {
-            ScrollView {
-                // Display the grid of cards
-                LazyVGrid(columns: columns, spacing: 20) {
-                    ForEach(Array(cards.indices), id: \.self) { index in
-                        CardView(card: cards[index])
-                            .onTapGesture {
-                                handleCardTap(at: index)
-                            }
-                            .padding(5) // Add padding around each card to give more space
-                    }
+        ZStack {
+            // Gradient background
+            LinearGradient(colors: [.black, .purple, .blue], startPoint: .topLeading, endPoint: .bottomTrailing)
+                .edgesIgnoringSafeArea(.all)
+            
+            VStack {
+                // Title
+                Text("Matching Game!")
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
+                    .foregroundStyle(LinearGradient(colors: [.purple, .pink, .orange], startPoint: .leading, endPoint: .trailing)) // Apply gradient to text color
+                    .padding()
+                    .shadow(color: .black.opacity(0.4), radius: 4, x: 2, y: 2) // Keep the shadow for depth
 
+                ScrollView {
+                    // Display the grid of cards
+                    LazyVGrid(columns: columns, spacing: 20) {
+                        ForEach(Array(cards.indices), id: \.self) { index in
+                            CardView(card: cards[index])
+                                .onTapGesture {
+                                    handleCardTap(at: index)
+                                }
+                                .padding(5) // Add padding around each card to give more space
+                        }
+                    }
+                    .padding()
+                }
+                
+                // Reset Game Button
+                Button("Reset Game") {
+                    resetGame()
                 }
                 .padding()
+                .background(Color.pink)
+                .foregroundColor(.white)
+                .cornerRadius(8)
+                .shadow(color: .black.opacity(0.4), radius: 4, x: 2, y: 2)
             }
-            
-            // Reset Game Button
-            Button("Reset Game") {
-                resetGame()
-            }
-            .padding()
         }
         .onAppear {
             startNewGame() // Initialize the game on load
@@ -127,6 +148,7 @@ struct ContentView: View {
         }
     }
 }
+
 
 #Preview {
     ContentView()
