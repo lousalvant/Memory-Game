@@ -53,9 +53,18 @@ struct ContentView: View {
     // State variables for the cards and the game logic
     @State private var cards: [Card] = [] // Store the deck of cards
     @State private var indexOfSelectedCard: Int? = nil
-
+    @State private var numberOfPairs: Int = 6 // Default to 6 pairs (3x4 grid)
+    
     // Grid layout configuration
-    let columns = [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())]
+    var columns: [GridItem] {
+        if numberOfPairs == 3 {
+            return [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())] // 3x2 grid
+        } else if numberOfPairs == 9 {
+            return [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())] // 3x6 grid
+        } else {
+            return [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())] // 3x4 grid
+        }
+    }
 
     var body: some View {
         ZStack {
@@ -71,7 +80,24 @@ struct ContentView: View {
                     .foregroundStyle(LinearGradient(colors: [.purple, .pink, .orange], startPoint: .leading, endPoint: .trailing)) // Apply gradient to text color
                     .padding()
                     .shadow(color: .black.opacity(0.4), radius: 4, x: 2, y: 2) // Keep the shadow for depth
-
+                
+                // Picker to select the number of pairs
+                Picker("Select Pairs", selection: $numberOfPairs) {
+                    Text("3 Pairs (3x2)").tag(3)  // Option for 3 pairs (3x2 grid)
+                    Text("6 Pairs (3x4)").tag(6)  // Default 6 pairs (3x4 grid)
+                    Text("9 Pairs (3x6)").tag(9)  // Option for 9 pairs (3x6 grid)
+                }
+                .pickerStyle(SegmentedPickerStyle())
+                .background(
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(LinearGradient(colors: [.purple, .pink, .orange], startPoint: .leading, endPoint: .trailing)) // Matching background for the picker
+                        .shadow(color: .black.opacity(0.4), radius: 4, x: 2, y: 2) // Shadow for depth
+                )
+                .padding()
+                .onChange(of: numberOfPairs) {
+                    resetGame()  // Automatically reset the game when pairs are changed
+                }
+                
                 ScrollView {
                     // Display the grid of cards
                     LazyVGrid(columns: columns, spacing: 20) {
@@ -145,9 +171,11 @@ struct ContentView: View {
         startNewGame() // Reset game
     }
 
+    // Update the number of pairs dynamically based on user selection
     func startNewGame() {
         // Emoji list for the card contents
-        let cardContents = ["🐶", "🐱", "🐭", "🐹", "🦊", "🐻"]
+        let allEmojis = ["🐶", "🐱", "🐭", "🐹", "🦊", "🐻", "🐼", "🐨", "🦁"]
+        let cardContents = Array(allEmojis.prefix(numberOfPairs))
         var deck = cardContents + cardContents // Two of each card for matching
         deck.shuffle() // Shuffle the deck
         
