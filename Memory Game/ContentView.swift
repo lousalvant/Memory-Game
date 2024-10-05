@@ -6,6 +6,7 @@ struct Card: Identifiable {
     let content: String
     var isFaceUp: Bool = false
     var isMatched: Bool = false
+    var isMatchedAnimation: Bool = false
 }
 
 // Card View
@@ -40,6 +41,9 @@ struct CardView: View {
             .frame(width: 80, height: 130)
             .rotation3DEffect(.degrees(card.isFaceUp ? 0 : 180), axis: (x: 0, y: 1, z: 0)) // Add 3D rotation for the flip
             .animation(.easeInOut(duration: 0.5), value: card.isFaceUp) // Smooth animation for flipping
+            .scaleEffect(card.isMatchedAnimation ? 1.3 : 1) // Scale up animation for match
+            .opacity(card.isMatchedAnimation ? 0 : 1) // Fade out when matched
+            .animation(.easeInOut(duration: 0.8), value: card.isMatchedAnimation)
         }
     }
 }
@@ -109,6 +113,11 @@ struct ContentView: View {
                 if cards[previousIndex].content == cards[index].content {
                     // Cards match
                     withAnimation {
+                        cards[previousIndex].isMatchedAnimation = true // Start match animation
+                        cards[index].isMatchedAnimation = true // Start match animation
+                    }
+                    // After a delay, mark the cards as fully matched
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
                         cards[previousIndex].isMatched = true
                         cards[index].isMatched = true
                     }
