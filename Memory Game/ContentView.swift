@@ -55,7 +55,7 @@ struct ContentView: View {
     @State private var indexOfSelectedCard: Int? = nil
 
     // Grid layout configuration
-    let columns = [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())] // 4x4 grid
+    let columns = [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())]
 
     var body: some View {
         ZStack {
@@ -147,7 +147,7 @@ struct ContentView: View {
 
     func startNewGame() {
         // Emoji list for the card contents
-        let cardContents = ["🐶", "🐱", "🐭", "🐹", "🦊", "🐻", "🐼", "🐨"]
+        let cardContents = ["🐶", "🐱", "🐭", "🐹", "🦊", "🐻"]
         var deck = cardContents + cardContents // Two of each card for matching
         deck.shuffle() // Shuffle the deck
         
